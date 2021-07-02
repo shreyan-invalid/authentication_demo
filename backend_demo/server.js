@@ -78,6 +78,7 @@ app.post("/register", (req, res) => {
         name: req.body.name,
         email: req.body.email,
         password: hashedPassword,
+        session: 0
       });
       await newUser.save();
       res.send("User Created");
@@ -92,7 +93,12 @@ app.get("/user", (req, res) => {
 });
 
 
-app.get('/logout', (req, res) => {
+app.get('/logout', async(req, res) => {
+  const currUser= await User.findOne({_id: req.user.id});
+
+  currUser.session= currUser.session - 1;
+  await currUser.save();
+
   req.logout();
   res.send('You are logged out');
 });
